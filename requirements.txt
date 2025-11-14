@@ -1,0 +1,11 @@
+matplotlib==3.8.0
+numpy==1.24.3
+opencv_python==4.10.0.84
+scipy==1.14.1
+tensorflow==2.14.0
+torch==2.1.1
+torchvision==0.16.1
+tqdm==4.65.0
+pygame==2.6.1
+gymnasium==0.29.1
+gym==0.26.2
