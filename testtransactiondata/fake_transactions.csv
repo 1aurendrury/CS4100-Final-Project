@@ -1,0 +1,101 @@
+date,merchant,brand,amount,category
+2025-11-25,CVS,CVS,112.08,other
+2025-11-03,Uber,Uber,58.67,ride_share
+2022-12-06,Uber,Uber,95.47,ride_share
+2025-01-18,United,United,105.02,air_travel
+2023-11-22,Target,Target,79.5,other
+2023-09-24,eBay,eBay,90.41,online_shopping
+2025-05-06,Walmart,Walmart,206.42,groceries
+2023-05-23,Marriott,Marriott,101.88,hotels
+2023-08-15,Mobil,Mobil,32.15,gas
+2023-06-22,Shell,Shell,215.06,gas
+2024-12-30,Mobil,Mobil,59.05,gas
+2024-02-25,Etsy,Etsy,272.9,online_shopping
+2023-01-27,BP,BP,197.37,gas
+2024-02-20,Whole Foods,Whole Foods,240.35,groceries
+2025-10-15,Uber,Uber,236.2,ride_share
+2024-02-19,Netflix,Netflix,25.92,streaming
+2023-09-24,Starbucks,Starbucks,7.36,dining
+2023-07-03,Hulu,Hulu,153.77,streaming
+2025-05-11,Delta,Delta,196.06,air_travel
+2023-02-21,United,United,38.5,air_travel
+2025-05-22,Spotify,Spotify,266.59,streaming
+2024-11-23,Netflix,Netflix,4.57,streaming
+2024-08-02,BP,BP,163.65,gas
+2025-05-15,CVS,CVS,5.68,other
+2024-01-29,United,United,116.57,air_travel
+2024-02-25,Shell,Shell,110.73,gas
+2023-02-17,Marriott,Marriott,110.62,hotels
+2024-09-27,Marriott,Marriott,201.35,hotels
+2023-07-20,eBay,eBay,272.86,online_shopping
+2025-03-31,Stop and Shop,Stop and Shop,207.69,groceries
+2024-06-01,Etsy,Etsy,125.24,online_shopping
+2024-06-16,Trader Joe's,Trader Joe's,230.63,groceries
+2023-06-18,Walmart,Walmart,233.99,groceries
+2024-06-07,Lyft,Lyft,278.33,ride_share
+2024-06-19,BP,BP,126.24,gas
+2025-07-30,Hilton,Hilton,105.36,hotels
+2024-12-31,Stop and Shop,Stop and Shop,111.36,groceries
+2023-06-24,Amazon,Amazon,86.52,online_shopping
+2025-09-23,United,United,98.18,air_travel
+2024-12-30,Whole Foods,Whole Foods,162.64,groceries
+2023-07-07,Uber,Uber,146.08,ride_share
+2025-09-14,Shell,Shell,134.49,gas
+2024-04-10,Uber,Uber,77.97,ride_share
+2024-12-15,eBay,eBay,270.47,online_shopping
+2025-11-08,Spotify,Spotify,206.37,streaming
+2025-07-29,Etsy,Etsy,177.85,online_shopping
+2024-07-16,Starbucks,Starbucks,250.88,dining
+2023-08-05,Whole Foods,Whole Foods,178.87,groceries
+2024-09-28,Hyatt,Hyatt,126.3,hotels
+2023-11-04,Hyatt,Hyatt,8.13,hotels
+2023-04-11,CVS,CVS,201.31,other
+2025-02-17,Stop and Shop,Stop and Shop,186.22,groceries
+2025-08-01,eBay,eBay,287.97,online_shopping
+2023-06-24,Lyft,Lyft,111.48,ride_share
+2025-06-30,Spotify,Spotify,88.52,streaming
+2025-06-26,United,United,141.69,air_travel
+2023-03-02,Marriott,Marriott,8.75,hotels
+2025-02-16,Netflix,Netflix,228.03,streaming
+2025-07-06,Uber,Uber,238.12,ride_share
+2023-03-26,Lyft,Lyft,284.98,ride_share
+2024-04-07,Spotify,Spotify,225.5,streaming
+2025-10-02,CVS,CVS,8.19,other
+2024-12-27,Marriott,Marriott,278.32,hotels
+2025-10-13,Spotify,Spotify,256.7,streaming
+2023-12-23,Starbucks,Starbucks,281.14,dining
+2023-08-31,Mobil,Mobil,181.48,gas
+2024-01-10,Lyft,Lyft,237.34,ride_share
+2024-07-02,Starbucks,Starbucks,80.67,dining
+2025-04-18,Mobil,Mobil,152.44,gas
+2025-10-31,Lyft,Lyft,255.74,ride_share
+2023-10-01,Netflix,Netflix,74.08,streaming
+2024-10-20,Shell,Shell,264.34,gas
+2024-06-10,Stop and Shop,Stop and Shop,279.42,groceries
+2024-02-23,Hyatt,Hyatt,287.92,hotels
+2023-08-03,Delta,Delta,105.12,air_travel
+2025-02-06,Whole Foods,Whole Foods,272.38,groceries
+2024-03-27,Spotify,Spotify,286.1,streaming
+2025-05-24,CVS,CVS,7.39,other
+2024-11-12,Uber,Uber,230.77,ride_share
+2025-10-27,Spotify,Spotify,241.8,streaming
+2025-05-05,Uber,Uber,173.47,ride_share
+2024-03-18,Hulu,Hulu,88.83,streaming
+2024-01-11,American Airlines,American Airlines,23.86,air_travel
+2024-06-23,Walmart,Walmart,239.95,groceries
+2023-01-06,Whole Foods,Whole Foods,215.14,groceries
+2025-09-30,Uber,Uber,197.49,ride_share
+2023-11-10,eBay,eBay,297.77,online_shopping
+2025-01-24,eBay,eBay,256.62,online_shopping
+2023-02-12,Amazon,Amazon,8.23,online_shopping
+2025-08-04,CVS,CVS,14.79,other
+2025-08-16,BP,BP,23.46,gas
+2024-04-05,Hulu,Hulu,155.23,streaming
+2023-02-01,United,United,229.54,air_travel
+2025-09-09,Netflix,Netflix,157.58,streaming
+2025-04-06,American Airlines,American Airlines,191.36,air_travel
+2025-07-27,Etsy,Etsy,208.25,online_shopping
+2023-09-21,Hilton,Hilton,60.47,hotels
+2024-07-18,Hulu,Hulu,155.3,streaming
+2023-05-01,American Airlines,American Airlines,175.32,air_travel
+2024-02-01,Hyatt,Hyatt,158.59,hotels
