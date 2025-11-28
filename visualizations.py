@@ -14,7 +14,7 @@ transactions_df = pd.read_csv("testtransactiondata/fake_transactions.csv")
 env = CreditCardEnv(cards_df, transactions_df, reward_type="both")
 
 # train Q-learning
-episode = 40000
+episode = 5000
 Q_table, all_rewards = Q_learning(env, episodes=episode)
 
 recommended_card = recommend_cards_by_category(env, Q_table)
@@ -81,9 +81,49 @@ def plot_per_card_rewards(per_card_rewards, env, episode):
     plt.tight_layout()
     plt.savefig(f"per_card_rewards_{episode}.png", dpi=300, bbox_inches="tight")
     plt.show()
+    
+def plot_policy_heatmap(Q_table, env, episode):
+    """ plot a heatmap of the learned policy: for each state (category, bucket), highlight which card has the highest Q-value. """
+
+    # convert Q-table to a df
+    df = pd.DataFrame.from_dict(Q_table, orient="index")
+    df.columns = env.cards["card_name"].tolist()
+
+    # compute the best action (argmax) for each state
+    best_actions = df.idxmax(axis=1)
+
+    # create a matrix df 1 where card == best card for that state, else 0
+    policy_matrix = pd.DataFrame(0, index=df.index, columns=df.columns)
+    
+    # iterate over the df index directly to ensure index format matches
+    for state in df.index:
+        best_card = best_actions.at[state]
+        policy_matrix.at[state, best_card] = 1
+
+    # sort states by category first, then by bucket number
+    sorted_states = sorted(policy_matrix.index, key=lambda x: (x[0], x[1]))
+    policy_matrix_sorted = policy_matrix.loc[sorted_states]
+
+    # plot with viridis colormap
+    plt.figure(figsize=(16, max(8, len(policy_matrix_sorted) * 0.3)))
+    sns.heatmap(policy_matrix_sorted,
+                cmap="viridis",
+                xticklabels=env.cards["card_name"].tolist(),
+                yticklabels=[str(s) for s in policy_matrix_sorted.index],
+                cbar_kws={"label": "Policy (1 = Best Card)"},
+                annot=False)
+
+    plt.title(f"Policy Heatmap (Best Card per State) after {episode} Episodes")
+    plt.xlabel("Cards")
+    plt.ylabel("States (Category, Amount Bucket)")
+    plt.tight_layout()
+    plt.savefig(f"policy_heatmap_{episode}.png", dpi=300, bbox_inches="tight")
+    plt.show()
+
 
 
 # call the functions to create the plots
 plot_training_rewards(all_rewards, episode)
 plot_q_table_heatmap(Q_table, env, episode)
 plot_per_card_rewards(per_card_rewards, env, episode)
+plot_policy_heatmap(Q_table, env, episode)
