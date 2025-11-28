@@ -73,7 +73,7 @@ if run_button:
     progress_text.text(f"Episode {current_episode} / {total_episodes}")
 
    # Train the Q-learning model with the progress callback
-   Q = Q_learning(
+   Q, all_rewards_lst = Q_learning(
        env,
        episodes=episodes,
        progress_callback=update_progress,  # Pass the callback function
