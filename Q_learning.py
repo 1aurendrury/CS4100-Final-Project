@@ -78,9 +78,9 @@ def Q_learning(
         if state not in Q_table:
             Q_table[state] = np.zeros(actions)
             counts[state] = np.zeros(actions)
-
-        total_rewards = 0
             
+        total_rewards = 0
+
         # loop through steps until done
         while not done:
             # choose action based on epsilon-greedy policy
@@ -121,9 +121,9 @@ def Q_learning(
             
             # update the state
             state = next_state
-
-        all_rewards.append(total_rewards)
             
+        all_rewards.append(total_rewards)
+
         # decay the epsilon value
         epsilon *= decay
     
