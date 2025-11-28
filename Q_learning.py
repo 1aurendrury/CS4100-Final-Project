@@ -11,6 +11,8 @@ BOLD = "\033[1m"
 RESET = "\033[0m"
 # 15% boost for reusing same card
 REUSE_BONUS_FACTOR = 0.15
+# Points conversion rate: 100 points = $1, so 1 point = $0.01
+POINTS_PER_DOLLAR = 100.0
 
 # IMPORTANT FRIENDLY REMINDER :D
 # below are some functions that I had in mind implementing when creating cc_optimizer_gym.py
@@ -289,13 +291,23 @@ def print_global_summary(env, recs, cat_rewards):
     print(f"\nTotal annual fees (unique cards only): ${total_fees:.2f}")
     
     if total_points > 0:
-        print(f"Total raw points earned: {total_points:.0f} points")
+        points_dollar_value = total_points / POINTS_PER_DOLLAR
+        print(f"Total raw points earned: {total_points:.0f} points (${points_dollar_value:.2f})")
+        
+        # for points mode, show net points after converting fees to points
+        if env.reward_type == "points":
+            fees_in_points = total_fees * POINTS_PER_DOLLAR
+            net_points = total_points - fees_in_points
+            net_points_dollar_value = net_points / POINTS_PER_DOLLAR
+            print(f"Annual fees in points: {fees_in_points:.0f} points (${total_fees:.2f})")
+            print(f"Net points after fees: {net_points:.0f} points (${net_points_dollar_value:.2f})")
+    
     if total_cash > 0:
         print(f"Total raw cashback earned: ${total_cash:.2f}")
         
-    # Net reward (raw - fees)
-    # Convert points to dollars for calculation purposes
-    net_value = total_cash + (total_points * 0.01) - total_fees
+    # net reward (raw - fees)
+    # convert points to dollars for calculation purposes (100 points = $1)
+    net_value = total_cash + (total_points / POINTS_PER_DOLLAR) - total_fees
     print(f"\n{BOLD}Net estimated yearly value: ${net_value:.2f}{RESET}")
 
 
