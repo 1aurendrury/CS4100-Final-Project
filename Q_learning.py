@@ -44,15 +44,28 @@ def Q_learning(
     gamma=0.95,
     epsilon=1.0,
     decay=0.995,
+    progress_callback=None,  # Add this parameter for progress updates
+    use_tqdm=True,  # For command-line
 ):
     # initialize Q-table, counts, action space, and update interval
     Q_table = {}
     counts = {}
     actions = env.action_space.n
-    all_rewards = []
+
+    # Create iterator with or without tqdm based on use_tqdm parameter
+    if use_tqdm and progress_callback is None:
+        # Use tqdm for command-line interface
+        episode_iterator = tqdm(range(episodes), desc="Training Q-learning")
+    else:
+        # Use plain range for Streamlit (with progress callback)
+        episode_iterator = range(episodes)
 
     # loop through episodes with progress bar
-    for ep in tqdm(range(episodes), desc="Training Q-learning"):
+    for ep in episode_iterator:
+        
+        # Call the progress callback if provided (for Streamlit)
+        if progress_callback is not None:
+            progress_callback(ep, episodes)
 
         # reset the environment
         obs, _, done, _ = env.reset()
@@ -64,8 +77,6 @@ def Q_learning(
         if state not in Q_table:
             Q_table[state] = np.zeros(actions)
             counts[state] = np.zeros(actions)
-
-        total_rewards = 0
             
         # loop through steps until done
         while not done:
@@ -77,7 +88,6 @@ def Q_learning(
                 action = np.random.choice(np.flatnonzero(qvals == qvals.max()))
             # take the action and get the next observation, reward, done, and info
             next_obs, reward, done, info = env.step(action)
-            total_rewards += reward
             
             # if there is no next observation, set the next state to None
             if next_obs is None:
@@ -107,15 +117,15 @@ def Q_learning(
             
             # update the state
             state = next_state
-
-        all_rewards.append(total_rewards)
             
         # decay the epsilon value
         epsilon *= decay
+    
+    # Call progress callback one final time to show 100% completion
+    if progress_callback is not None:
+        progress_callback(episodes, episodes)
         
-    return Q_table, all_rewards
-
-
+    return Q_table
 
 def evaluate_policy(env, Q_table):
     # initialize total reward and per card reward
@@ -329,7 +339,7 @@ def main():
     # train Q-learning model
     print(f"\nTraining Q-learning model for {args.episodes} episodes...")
     qstart = time.time()
-    Q, all_rewards_lst = Q_learning(env, episodes=args.episodes)
+    Q = Q_learning(env, episodes=args.episodes, use_tqdm=True)
     print(f"Training complete in {time.time()-qstart:.2f}s")
     
     # get recommendations for best card per category

@@ -11,7 +11,6 @@ st.markdown("""Upload your credit card dataset and transaction history,
             and let the reinforcement learning model recommend the **best credit card for each of your spending categories**. 
             If you do not upload a credit cards file, we will use the system default one (30+ of the most popular credit cards in the US).""")
 
-
 # upload cards and transactions files
 cards_file = st.file_uploader("Upload credit cards (optional)", type=["csv"])
 tx_file = st.file_uploader("Upload transactions (required)", type=["csv"])
@@ -57,11 +56,33 @@ if run_button:
    env = CreditCardEnv(cards_df, tx_df, reward_type=mode)
 
    # train Q-learning model
-   with st.spinner("Q-learning in progress..."):
-       Q = Q_learning(
-           env,
-           episodes=episodes,
-       )
+   st.write("Training Q-learning model...")
+
+   # Create a progress bar widget
+   progress_bar = st.progress(0)
+   # Create a text widget to show episode number
+   progress_text = st.empty()
+
+   # Define a callback function that updates the Streamlit progress bar
+   def update_progress(current_episode, total_episodes):
+    # Calculate progress as a percentage (0.0 to 1.0)
+    progress = current_episode / total_episodes
+    # Update the progress bar
+    progress_bar.progress(progress)
+    # Update the text to show current episode
+    progress_text.text(f"Episode {current_episode} / {total_episodes}")
+
+   # Train the Q-learning model with the progress callback
+   Q = Q_learning(
+       env,
+       episodes=episodes,
+       progress_callback=update_progress,  # Pass the callback function
+       use_tqdm=False,  # Disable tqdm in Streamlit
+    )
+
+   # Clear the progress widgets after training is complete
+   progress_bar.empty()
+   progress_text.empty()
 
    st.success("Training complete! Running recommendations...")
 
@@ -96,7 +117,6 @@ if run_button:
    df_out = pd.DataFrame(rows, columns=["Category", "Recommended Card", "Multiplier", "Annual Fee", "Estimated Raw Reward"])
    # print results table to the app
    st.table(df_out)
-
 
    # print global summary
    st.header("Global Summary")
