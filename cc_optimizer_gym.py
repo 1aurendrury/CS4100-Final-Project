@@ -21,8 +21,12 @@ def parse_reward_category_map(raw_rewards_map: str):
         multiplier = token_segments[0]
         category = token_segments[1]
         # convert the multiplier to a float and add the category to the map
-        multiplier = float(multiplier)
-        rewards_map[category.strip()] = multiplier
+        try:
+            multiplier = float(multiplier)
+            rewards_map[category.strip()] = multiplier
+        except ValueError:
+            # skip invalid multiplier values (shouldn't ever happen with cards.csv but good practice)
+            continue
     return rewards_map
 
 
@@ -51,6 +55,24 @@ class CreditCardEnv:
             reward_map_str = card_row.get("reward_category_map", "")
             category_map = parse_reward_category_map(reward_map_str)
             self.card_category_maps.append(category_map)
+            
+        # collect all known categories for future matching
+        # this is needed to normalize the transaction categories to standard names found in the cards.csv file for matching (when we use real data)
+        known_categories = set()
+        for m in self.card_category_maps:
+            known_categories.update(m.keys())
+        known_categories.add("other")
+        self.known_categories = sorted(known_categories)
+        
+        # initialize a set to track unknown categories that don't match up with any of the categories in cards.csv
+        self._unknown_category_seen = set()
+        
+        # raise error if the transactions df does not contain a 'category' column, which is required for processing transactions
+        if "category" not in self.transactions.columns:
+            raise ValueError("Given transactions csv must contain a 'category' column")
+        
+        # normalize the transaction categories to standard names found in the cards.csv file for matching
+        self.transactions["category"] = self.transactions["category"].apply(self._normalize_category_name)
 
         # set the number of cards and the action space (using gym Discrete space)
         self.num_cards = len(self.cards)
@@ -60,6 +82,48 @@ class CreditCardEnv:
         self._transaction_index = 0
         self._used_cards_this_episode = set()
         
+    
+    def _normalize_category_name(self, raw_cat):
+        """normalize transaction categories to the known categories found in the cards.csv file"""
+        # if the category is missing, return 'other'
+        if pd.isna(raw_cat):
+            return "other"
+
+        # convert the category to a string and strip whitespace
+        cat = str(raw_cat).strip().lower()
+    
+        # if the category is already in the known categories, return it without modification
+        if cat in self.known_categories:
+            return cat
+        
+        # try to match common transaction patterns to known categories found in cards.csv
+        if any(p in cat for p in ["restaurant", "dining", "cafe", "food", "bar"]):
+            return "dining"
+        if any(p in cat for p in ["grocery", "market", "supermarket", "grocery store", "grocery shop"]):
+            return "groceries"
+        if any(p in cat for p in ["gas", "fuel", "petrol"]):
+            return "gas"
+        if any(p in cat for p in ["airfare", "air travel", "airline", "flight"]):
+            return "air_travel"
+        if any(p in cat for p in ["hotel", "inn", "resort", "hotel booking", "hotel reservation"]):
+            return "hotels"
+        if any(p in cat for p in ["uber", "lyft", "taxi", "cab", "ride"]):
+            return "ride_share"
+        if any(p in cat for p in ["stream", "netflix", "spotify", "hulu", "hbo max", "disney+", "paramount+"]):
+            return "streaming"
+        if any(p in cat for p in ["online", "amazon", "ecommerce", "shop", "shop online"]):
+            return "online_shopping"
+        if "misc" in cat or "other" in cat:
+            return "other"
+
+        # give up and use 'other' if the category is not found in the cards.csv file
+        if cat not in self._unknown_category_seen:
+            # print warning for unknown categories, use this for debugging now, might remove later
+            print(f"[WARNING] Unknown category '{cat}' was mapped to 'other'")
+            self._unknown_category_seen.add(cat)
+
+        return "other"
+
 
     def _get_current_transaction(self):
         """helper function to get/break down the current transaction we're processing for the current step in the episode"""
@@ -86,10 +150,10 @@ class CreditCardEnv:
         # find the multiplier for this category using the category map
         if category in category_map:
             multiplier = category_map[category]
+        elif "other" in category_map:
+            multiplier = category_map["other"]
         else:
             # if the category is not found in the category map, use a multiplier of 1.0 as a default (typical for most cards)
-            # note that this is different from the default multiplier of 1.0 for cards with no category map!
-            # also note that this won't ever be reached with our fake data, but it's good to have for when we use real data (tbd in a later PR)
             multiplier = 1.0
 
         # get the reward type for the card (points or cashback)
