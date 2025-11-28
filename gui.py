@@ -159,17 +159,17 @@ if run_button:
     progress_text.text(f"Episode {current_episode} / {total_episodes}")
 
    # Train the Q-learning model with the progress callback
-   Q, all_rewards = Q_learning(  # Now receives both Q_table and all_rewards
+   Q, all_rewards_lst = Q_learning(
        env,
        episodes=episodes,
-       progress_callback=update_progress,
-       use_tqdm=False,
+       progress_callback=update_progress,  # Pass the callback function
+       use_tqdm=False,  # Disable tqdm in Streamlit
     )
-   
+
    # Clear the progress widgets after training is complete
    progress_bar.empty()
    progress_text.empty()
-   
+
    st.success("Training complete! Running recommendations...")
    
    # Evaluate the policy to get per-card rewards
@@ -201,7 +201,7 @@ if run_button:
    df_out = pd.DataFrame(rows, columns=["Category", "Recommended Card", "Multiplier", "Annual Fee", "Estimated Raw Reward"])
    # print results table to the app
    st.table(df_out)
-   
+
    # print global summary
    st.header("Global Summary")
    
