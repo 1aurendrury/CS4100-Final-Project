@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 from gym.spaces import Discrete
 
+# points conversion rate: 100 points = $1, so 1 point = $0.01
+POINTS_PER_DOLLAR = 100.0
+
 
 def parse_reward_category_map(raw_rewards_map: str):
     """helper function to turn cards.csv reward strings like '4x:dining;3x:gas' into a dict mapping the card's categories to multipliers"""
@@ -160,19 +163,35 @@ class CreditCardEnv:
         reward_type = str(card["reward_type"]).lower()
 
         # only count rewards if they match what we're optimizing for, otherwise set reward to 0.0
-        if self.reward_type == "points":
-            reward = amount * multiplier if reward_type == "points" else 0.0
-        elif self.reward_type == "cashback":
-            reward = amount * multiplier if reward_type == "cashback" else 0.0
+        # note that this checks the reward type arg and the reward type for the card
+        if self.reward_type == "points" and reward_type == "points":
+            # for points mode: amount * multiplier gives points (ex. 4x = 4 points per dollar)
+            reward = amount * multiplier
+        elif self.reward_type == "cashback" and reward_type == "cashback":
+            # for cashback: amount * multiplier * 0.01 converts percentage to decimal (ex. 6x = 6% = 0.06)
+            reward = amount * multiplier * 0.01
+        elif self.reward_type == "both":
+            # "both" mode: calculate both points and cashback, but convert to USD for consistent units (100 points = $1 again here))
+            if reward_type == "points":
+                # convert points to USD (100 points = $1, so divide by POINTS_PER_DOLLAR)
+                reward = amount * multiplier / POINTS_PER_DOLLAR
+            elif reward_type == "cashback":
+                reward = amount * multiplier * 0.01
         else:
-            # otherwise, set reward to 0.0
+            # optimization mode doesn't match card reward type, set reward to 0.0
             reward = 0.0
-
 
         # subtract annual fee only the first time we use a card in an episode to avoid double counting annual fees at the end
         if card_idx not in self._used_cards_this_episode:
             fee = float(card["annual_fee_usd"])
-            reward -= fee
+            # fees are in USD, so we need to ensure reward is also in USD before subtracting
+            # for points rewards, convert fee to points equivalent (100 points = $1)
+            if self.reward_type == "points" and reward_type == "points":
+                # reward is in points, convert fee to points equivalent
+                reward -= fee * POINTS_PER_DOLLAR
+            else:
+                # for cashback or "both" mode, rewards are already in USD, so subtract fee directly
+                reward -= fee
             self._used_cards_this_episode.add(card_idx)
 
         return reward
