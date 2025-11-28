@@ -99,7 +99,7 @@ class CreditCardEnv:
         if self.reward_type == "points":
             reward = amount * multiplier if reward_type == "points" else 0.0
         elif self.reward_type == "cashback":
-            reward = amount * multiplier if reward_type == "cashback" else 0.0
+            reward = amount * multiplier * 0.01 if reward_type == "cashback" else 0.0
         else:
             # otherwise, set reward to 0.0
             reward = 0.0
