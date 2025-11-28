@@ -51,6 +51,7 @@ def Q_learning(
     Q_table = {}
     counts = {}
     actions = env.action_space.n
+    all_rewards = []
 
     # Create iterator with or without tqdm based on use_tqdm parameter
     if use_tqdm and progress_callback is None:
@@ -78,6 +79,8 @@ def Q_learning(
             Q_table[state] = np.zeros(actions)
             counts[state] = np.zeros(actions)
             
+        total_rewards = 0
+
         # loop through steps until done
         while not done:
             # choose action based on epsilon-greedy policy
@@ -88,6 +91,7 @@ def Q_learning(
                 action = np.random.choice(np.flatnonzero(qvals == qvals.max()))
             # take the action and get the next observation, reward, done, and info
             next_obs, reward, done, info = env.step(action)
+            total_rewards += reward
             
             # if there is no next observation, set the next state to None
             if next_obs is None:
@@ -118,6 +122,8 @@ def Q_learning(
             # update the state
             state = next_state
             
+        all_rewards.append(total_rewards)
+
         # decay the epsilon value
         epsilon *= decay
     
@@ -125,7 +131,7 @@ def Q_learning(
     if progress_callback is not None:
         progress_callback(episodes, episodes)
         
-    return Q_table
+    return Q_table, all_rewards
 
 def evaluate_policy(env, Q_table):
     # initialize total reward and per card reward
@@ -339,7 +345,7 @@ def main():
     # train Q-learning model
     print(f"\nTraining Q-learning model for {args.episodes} episodes...")
     qstart = time.time()
-    Q = Q_learning(env, episodes=args.episodes, use_tqdm=True)
+    Q, all_rewards_lst = Q_learning(env, episodes=args.episodes, use_tqdm=True)
     print(f"Training complete in {time.time()-qstart:.2f}s")
     
     # get recommendations for best card per category
