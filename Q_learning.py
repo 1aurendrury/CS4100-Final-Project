@@ -49,6 +49,7 @@ def Q_learning(
     Q_table = {}
     counts = {}
     actions = env.action_space.n
+    all_rewards = []
 
     # loop through episodes with progress bar
     for ep in tqdm(range(episodes), desc="Training Q-learning"):
@@ -63,6 +64,8 @@ def Q_learning(
         if state not in Q_table:
             Q_table[state] = np.zeros(actions)
             counts[state] = np.zeros(actions)
+
+        total_rewards = 0
             
         # loop through steps until done
         while not done:
@@ -74,6 +77,7 @@ def Q_learning(
                 action = np.random.choice(np.flatnonzero(qvals == qvals.max()))
             # take the action and get the next observation, reward, done, and info
             next_obs, reward, done, info = env.step(action)
+            total_rewards += reward
             
             # if there is no next observation, set the next state to None
             if next_obs is None:
@@ -103,11 +107,13 @@ def Q_learning(
             
             # update the state
             state = next_state
+
+        all_rewards.append(total_rewards)
             
         # decay the epsilon value
         epsilon *= decay
         
-    return Q_table
+    return Q_table, all_rewards
 
 
 
@@ -323,7 +329,7 @@ def main():
     # train Q-learning model
     print(f"\nTraining Q-learning model for {args.episodes} episodes...")
     qstart = time.time()
-    Q = Q_learning(env, episodes=args.episodes)
+    Q, all_rewards_lst = Q_learning(env, episodes=args.episodes)
     print(f"Training complete in {time.time()-qstart:.2f}s")
     
     # get recommendations for best card per category
