@@ -14,7 +14,7 @@ transactions_df = pd.read_csv("testtransactiondata/fake_transactions.csv")
 env = CreditCardEnv(cards_df, transactions_df, reward_type="both")
 
 # train Q-learning
-episode = 5000
+episode = 40000
 Q_table, all_rewards = Q_learning(env, episodes=episode)
 
 recommended_card = recommend_cards_by_category(env, Q_table)
@@ -33,36 +33,6 @@ def plot_training_rewards(all_rewards, episode):
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"running_average_{episode}.png", dpi=300, bbox_inches="tight")
-    plt.show()
-
-
-def plot_q_table_heatmap(Q_table, env, episode):
-    """ create Q-table heatmap to show what the model learned per category/card
-    used AI to help fix the layout of the plot so that everything could be displayed evenly """
-
-    # convert Q_table dictionary to a df
-    df = pd.DataFrame.from_dict(Q_table, orient="index")
-
-    card_names = env.cards["card_name"].tolist()
-    df.columns = card_names
-
-    # normalize each row for comparison to see which card is best
-    df_norm = df.div(df.max(axis=1), axis=0).fillna(0)
-
-    plt.figure(figsize=(16, max(8, len(df_norm) * 0.3)))
-
-    sns.heatmap(df_norm,
-                cmap="viridis",
-                xticklabels=card_names,
-                yticklabels=[str(s) for s in df_norm.index],
-                cbar_kws={"label": "Normalized Q-value"},
-                annot=False)
-
-    plt.title(f"Q-Table Heatmap for {episode} Episodes")
-    plt.xlabel("Cards")
-    plt.ylabel("States (Category, Amount Bucket)")
-    plt.tight_layout()
-    plt.savefig(f"heatmap_{episode}.png", dpi=300, bbox_inches="tight")
     plt.show()
 
 
@@ -124,6 +94,5 @@ def plot_policy_heatmap(Q_table, env, episode):
 
 # call the functions to create the plots
 plot_training_rewards(all_rewards, episode)
-plot_q_table_heatmap(Q_table, env, episode)
 plot_per_card_rewards(per_card_rewards, env, episode)
 plot_policy_heatmap(Q_table, env, episode)
