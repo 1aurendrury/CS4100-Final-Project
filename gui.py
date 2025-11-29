@@ -26,35 +26,6 @@ def plot_training_rewards_streamlit(all_rewards):
     
     return fig
 
-def plot_q_table_heatmap_streamlit(Q_table, env):
-    """ create Q-table heatmap to show what the model learned per category/card """
-
-    # convert Q_table dictionary to a df
-    df = pd.DataFrame.from_dict(Q_table, orient="index")
-
-    card_names = env.cards["card_name"].tolist()
-    df.columns = card_names
-    
-    # normalize each row for comparison
-    df_norm = df.div(df.max(axis=1), axis=0).fillna(0)
-    
-    # Plot the heatmap
-    fig, ax = plt.subplots(figsize=(16, max(8, len(df_norm) * 0.3)))
-    sns.heatmap(df_norm,
-                cmap="viridis",
-                xticklabels=card_names,
-                yticklabels=[str(s) for s in df_norm.index],
-                cbar_kws={"label": "Normalized Q-value"},
-                annot=False,
-                ax=ax)
-    ax.set_title("Q-Table Heatmap: Learned Card Values by State", fontsize=14, fontweight='bold')
-    ax.set_xlabel("Credit Cards", fontsize=12)
-    ax.set_ylabel("States (Category, Amount Bucket)", fontsize=12)
-    plt.xticks(rotation=45, ha='right')
-    plt.tight_layout()
-
-    return fig
-
 def plot_per_card_rewards_streamlit(per_card_rewards, env):
     """ create a bar plot showing total rewards earned per card """
     fig, ax = plt.subplots(figsize=(12, 6))
@@ -83,6 +54,40 @@ def plot_per_card_rewards_streamlit(per_card_rewards, env):
     ax.set_ylabel("Total Reward", fontsize=12)
     ax.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
     ax.grid(True, alpha=0.3, axis='y')
+    plt.tight_layout()
+
+    return fig
+
+def plot_policy_heatmap_streamlit(Q_table, env):
+    """ plot a heatmap of the learned policy: for each state (category, bucket), highlight which card has the highest Q-value. """
+    # convert Q-table to a df
+    df = pd.DataFrame.from_dict(Q_table, orient="index")
+    df.columns = env.cards["card_name"].tolist()
+    # compute the best action (argmax) for each state
+    best_actions = df.idxmax(axis=1)
+    # create a matrix df 1 where card == best card for that state, else 0
+    policy_matrix = pd.DataFrame(0, index=df.index, columns=df.columns)
+    # iterate over the df index directly to ensure index format matches
+    for state in df.index:
+        best_card = best_actions.at[state]
+        policy_matrix.at[state, best_card] = 1
+    # sort states by category first, then by bucket number
+    sorted_states = sorted(policy_matrix.index, key=lambda x: (x[0], x[1]))
+    policy_matrix_sorted = policy_matrix.loc[sorted_states]
+    # plot with viridis colormap
+    fig, ax = plt.subplots(figsize=(16, max(8, len(policy_matrix_sorted) * 0.3)))
+    sns.heatmap(policy_matrix_sorted,
+                cmap="viridis",
+                xticklabels=env.cards["card_name"].tolist(),
+                yticklabels=[str(s) for s in policy_matrix_sorted.index],
+                cbar_kws={"label": "Policy (1 = Best Card)"},
+                annot=False,
+                ax=ax)
+
+    ax.set_title("Policy Heatmap (Best Card per State and Amount Bucket after Training)", fontsize=14, fontweight='bold')
+    ax.set_xlabel("Credit Cards", fontsize=12)
+    ax.set_ylabel("States (Category, Amount Bucket)", fontsize=12)
+    plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
 
     return fig
@@ -250,18 +255,18 @@ if run_button:
    st.pyplot(fig1)
    plt.close(fig1)  # Close to free memory
    
-   # Plot 2: Q-Table Heatmap
-   st.subheader("2. Q-Table Heatmap")
-   st.write("This heatmap shows which cards the agent learned are best for different spending categories and amounts.")
-   fig2 = plot_q_table_heatmap_streamlit(Q, env)
-   st.pyplot(fig2)
-   plt.close(fig2)  # Close to free memory
-   
-   # Plot 3: Per-Card Rewards
+   # Plot 2: Per-Card Rewards
    st.subheader("3. Rewards Earned Per Card")
    st.write("This chart shows the total rewards (or losses from fees) for each card used during evaluation.")
    fig3 = plot_per_card_rewards_streamlit(per_card_rewards, env)
    st.pyplot(fig3)
    plt.close(fig3)  # Close to free memory
+   
+   # Plot 3: Policy Heatmap
+   st.subheader("4. Policy Heatmap")
+   st.write("This heatmap shows which card the agent learned is best for each spending category and amount bucket.")
+   fig4 = plot_policy_heatmap_streamlit(Q, env)
+   st.pyplot(fig4)
+   plt.close(fig4)  # Close to free memory
    
    st.success("Credit card optimizer complete!")
