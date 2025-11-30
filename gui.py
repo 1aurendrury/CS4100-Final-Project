@@ -128,7 +128,7 @@ if run_button:
    # load cards dataframe
    if cards_file is None:
        st.warning("No credit cards file uploaded - using default dataset (30+ of the most popular credit cards in the US).")
-       cards_path = "creditcards/cards.csv"
+       cards_path = "credit_cards/cards.csv"
 
        # try to load default cards file
        try:
@@ -256,14 +256,14 @@ if run_button:
    plt.close(fig1)  # Close to free memory
    
    # Plot 2: Per-Card Rewards
-   st.subheader("3. Rewards Earned Per Card")
+   st.subheader("2. Rewards Earned Per Card")
    st.write("This chart shows the total rewards (or losses from fees) for each card used during evaluation.")
    fig3 = plot_per_card_rewards_streamlit(per_card_rewards, env)
    st.pyplot(fig3)
    plt.close(fig3)  # Close to free memory
    
    # Plot 3: Policy Heatmap
-   st.subheader("4. Policy Heatmap")
+   st.subheader("3. Policy Heatmap")
    st.write("This heatmap shows which card the agent learned is best for each spending category and amount bucket.")
    fig4 = plot_policy_heatmap_streamlit(Q, env)
    st.pyplot(fig4)
