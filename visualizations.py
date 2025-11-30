@@ -7,8 +7,8 @@ import seaborn as sns
 import pandas as pd
 
 
-cards_df = pd.read_csv("creditcards/cards.csv")
-transactions_df = pd.read_csv("testtransactiondata/fake_transactions.csv")
+cards_df = pd.read_csv("credit_cards/cards.csv")
+transactions_df = pd.read_csv("test_data/fake_transactions.csv")
 
 # create environment (reward_type = points, cashback, both)
 env = CreditCardEnv(cards_df, transactions_df, reward_type="both")
