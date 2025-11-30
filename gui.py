@@ -128,7 +128,7 @@ if run_button:
    # load cards dataframe
    if cards_file is None:
        st.warning("No credit cards file uploaded - using default dataset (30+ of the most popular credit cards in the US).")
-       cards_path = "creditcards/cards.csv"
+       cards_path = "credit_cards/cards.csv"
 
        # try to load default cards file
        try:
