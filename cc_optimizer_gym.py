@@ -35,10 +35,6 @@ def parse_reward_category_map(raw_rewards_map: str):
 
 class CreditCardEnv:
     """environment for learning which credit card to use for each transaction"""
-    # initialize the environment with the cards and transactions dataframes, and the reward type
-    # ideally this will take in cards.csv, transactions.csv, and the reward type as arguments
-    # these will probably be arg parsed in the Q_learning.py file
-    # note that everything below is subject to change, but this is the general idea atm since Q_learning.py isn't implemented yet!
     
     def __init__(self, cards_df, transactions_df, reward_type="points"):
         # make copies of cards and transactions dfs so we don't edit the originals

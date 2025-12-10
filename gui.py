@@ -6,14 +6,14 @@ import seaborn as sns
 from cc_optimizer_gym import CreditCardEnv
 from Q_learning import Q_learning, recommend_cards_by_category, compute_category_rewards, evaluate_policy
 
-# ==== Helper Functions for Plotting, Based on Functions from visualizations.py ====
+# Helper Functions for Plotting Visualizations
 
 def plot_training_rewards_streamlit(all_rewards):
     """ create plot to show training rewards over time """
     fig, ax = plt.subplots(figsize=(12, 6))
     ax.plot(all_rewards, color="blue", alpha=0.3, label="Rewards per Episode")
     
-    # Plot running average
+    # plot running average
     running_avg = np.cumsum(all_rewards) / np.arange(1, len(all_rewards) + 1)
     ax.plot(running_avg, color="red", linewidth=2, label="Running Average")
     ax.set_title(f"Training Rewards Over {len(all_rewards)} Episodes", fontsize=14, fontweight='bold')
@@ -35,16 +35,16 @@ def plot_per_card_rewards_streamlit(per_card_rewards, env):
     card_names = [env.cards.iloc[i]["card_name"] for i in card_indices]
     rewards = list(per_card_rewards.values())
     
-    # Create a dataframe for easier plotting
+    # create a dataframe for easier plotting
     df_rewards = pd.DataFrame({
         'Card': card_names,
         'Reward': rewards
     })
     
-    # Sort by reward value (descending)
+    # sort by reward value (descending)
     df_rewards = df_rewards.sort_values('Reward', ascending=False)
     
-    # Create bar plot
+    # create bar plot
     colors = ['green' if r > 0 else 'red' for r in df_rewards['Reward']]
     ax.bar(range(len(df_rewards)), df_rewards['Reward'], color=colors, alpha=0.7)
     ax.set_xticks(range(len(df_rewards)))
@@ -92,10 +92,9 @@ def plot_policy_heatmap_streamlit(Q_table, env):
 
     return fig
 
-# ==== Streamlit Webpage ====
+# Streamlit Page Code
 
 # quick wip of a streamlit app for the credit card optimizer, runs on localhost:8501 when you run 'streamlit run gui.py' in terminal
-# todos for the AM: fix the graphs to be descending by value, fix points calculation, seems slightly off atm (might be for Q-learning)
 st.set_page_config(page_title="Credit Card Optimizer", layout="wide")
 st.title("Credit Card Q-Learning Optimizer")
 st.markdown("""Upload your credit card dataset and transaction history, 
@@ -149,35 +148,35 @@ if run_button:
    # train Q-learning model
    st.write("Training Q-learning model...")
 
-   # Create a progress bar widget
+   # create a progress bar widget
    progress_bar = st.progress(0)
-   # Create a text widget to show episode number
+   # create a text widget to show episode number
    progress_text = st.empty()
 
-   # Define a callback function that updates the Streamlit progress bar
+   # define a callback function that updates the Streamlit progress bar
    def update_progress(current_episode, total_episodes):
-    # Calculate progress as a percentage (0.0 to 1.0)
+    # calculate progress as a percentage (0.0 to 1.0)
     progress = current_episode / total_episodes
-    # Update the progress bar
+    # update the progress bar
     progress_bar.progress(progress)
-    # Update the text to show current episode
+    # update the text to show current episode
     progress_text.text(f"Episode {current_episode} / {total_episodes}")
 
-   # Train the Q-learning model with the progress callback
+   # train the Q-learning model with the progress callback
    Q, all_rewards = Q_learning(
        env,
        episodes=episodes,
-       progress_callback=update_progress,  # Pass the callback function
-       use_tqdm=False,  # Disable tqdm in Streamlit
+       progress_callback=update_progress,
+       use_tqdm=False,
     )
 
-   # Clear the progress widgets after training is complete
+   # clear the progress widgets after training is complete
    progress_bar.empty()
    progress_text.empty()
 
    st.success("Training complete! Running recommendations...")
    
-   # Evaluate the policy to get per-card rewards
+   # evaluate the policy to get per-card rewards
    total_reward, per_card_rewards = evaluate_policy(env, Q)
    
    # get recommendations for best card per category
@@ -244,29 +243,29 @@ if run_button:
        st.write("**Top Merchants/Brands:**")
        st.bar_chart(brand_totals)
    
-   # ===== Plot Visualizations =====
+   # Plot Visualizations
 
    st.header("Training & Performance Visualizations")
    
-   # Plot 1: Training Rewards
+   # plot 1: training rewards
    st.subheader("1. Training Progress")
    st.write("This chart shows how the agent's performance improved over training episodes.")
    fig1 = plot_training_rewards_streamlit(all_rewards)
    st.pyplot(fig1)
-   plt.close(fig1)  # Close to free memory
+   plt.close(fig1)
    
-   # Plot 2: Per-Card Rewards
+   # plot 2: per-card rewards
    st.subheader("2. Rewards Earned Per Card")
    st.write("This chart shows the total rewards (or losses from fees) for each card used during evaluation.")
    fig3 = plot_per_card_rewards_streamlit(per_card_rewards, env)
    st.pyplot(fig3)
-   plt.close(fig3)  # Close to free memory
+   plt.close(fig3)
    
-   # Plot 3: Policy Heatmap
+   # plot 3: policy heatmap
    st.subheader("3. Policy Heatmap")
    st.write("This heatmap shows which card the agent learned is best for each spending category and amount bucket.")
    fig4 = plot_policy_heatmap_streamlit(Q, env)
    st.pyplot(fig4)
-   plt.close(fig4)  # Close to free memory
+   plt.close(fig4)
    
    st.success("Credit card optimizer complete!")
