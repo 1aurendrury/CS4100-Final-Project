@@ -44,8 +44,8 @@ def Q_learning(
     gamma=0.95,
     epsilon=1.0,
     decay=0.995,
-    progress_callback=None,  # Add this parameter for progress updates
-    use_tqdm=True,  # For command-line
+    progress_callback=None,
+    use_tqdm=True,
 ):
     # initialize Q-table, counts, action space, and update interval
     Q_table = {}
@@ -53,18 +53,18 @@ def Q_learning(
     actions = env.action_space.n
     all_rewards = []
 
-    # Create iterator with or without tqdm based on use_tqdm parameter
+    # create iterator with or without tqdm based on use_tqdm parameter
     if use_tqdm and progress_callback is None:
-        # Use tqdm for command-line interface
+        # use tqdm for command-line interface
         episode_iterator = tqdm(range(episodes), desc="Training Q-learning")
     else:
-        # Use plain range for Streamlit (with progress callback)
+        # use plain range for Streamlit (with progress callback)
         episode_iterator = range(episodes)
 
     # loop through episodes with progress bar
     for ep in episode_iterator:
         
-        # Call the progress callback if provided (for Streamlit)
+        # call the progress callback if provided (for Streamlit)
         if progress_callback is not None:
             progress_callback(ep, episodes)
 
@@ -127,7 +127,7 @@ def Q_learning(
         # decay the epsilon value
         epsilon *= decay
     
-    # Call progress callback one final time to show 100% completion
+    # call progress callback one final time to show 100% completion
     if progress_callback is not None:
         progress_callback(episodes, episodes)
         
@@ -329,7 +329,7 @@ def spending_summary(df):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cards", required=False) # we can use default cards.csv if not provided
+    parser.add_argument("--cards", required=False)
     parser.add_argument("--transactions", required=True)
     parser.add_argument("--mode", choices=["points", "cashback", "both"], default="points")
     parser.add_argument("--episodes", type=int, default=5000)
