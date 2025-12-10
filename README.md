@@ -78,6 +78,14 @@ streamlit run gui.py
 python visualizations.py
 ```
 
+## Example Visualizations (40,000 Episodes)
+
+<div align="center">
+  <img src="running_averages/running_average_40000.png" width="32%" />
+  <img src="policy_heatmaps/policy_heatmap_40000.png" width="32%" />
+  <img src="per_card_rewards/per_card_rewards_40000.png" width="32%" />
+</div>
+
 ## Future Expansions
 Despite the effectiveness of our project, some limitations and room for future expansion remain. Our current approach does not consider card credits and offers, such as the 7 US dollar monthly Dunkin credit for the American Express Gold Card. Furthermore, cards with rotating categories did not have said category multipliers factored in, and their base multipliers were used instead. We were also unable to add sign up bonuses to the evaluation process, as this number can vary from person to person. While our model can certainly be expanded to consider all of these factors, we were still able to create an effective and simple Q-learning agent that can give the user meaningful insights on their organic spend and help recommend cards that will maximize rewards on all of their categories.
 
